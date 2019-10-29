@@ -44,6 +44,7 @@ import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settingslib.search.SearchIndexable;
 
 import com.crdroid.settings.fragments.ui.doze.Utils;
+import com.crdroid.settings.preferences.CustomSeekBarPreference;
 import com.crdroid.settings.preferences.SecureSettingSeekBarPreference;
 
 import java.util.List;
@@ -66,6 +67,8 @@ public class DozeSettings extends SettingsPreferenceFragment implements
     private static final String KEY_DOZE_POCKET_GESTURE = "doze_pocket_gesture";
     private static final String KEY_RAISE_TO_WAKE_GESTURE = "raise_to_wake_gesture";
     private static final String KEY_DOZE_GESTURE_VIBRATE = "doze_gesture_vibrate";
+    private static final String KEY_PULSE_BRIGHTNESS = "ambient_pulse_brightness";
+    private static final String KEY_DOZE_BRIGHTNESS = "ambient_doze_brightness";
 
     private SwitchPreference mDozeAlwaysOnPreference;
     private SwitchPreference mDozeOnChargePreference;
@@ -75,6 +78,8 @@ public class DozeSettings extends SettingsPreferenceFragment implements
     private SwitchPreference mPocketPreference;
     private SwitchPreference mRaiseToWakePreference;
     private SecureSettingSeekBarPreference mDozeVibratePreference;
+    private CustomSeekBarPreference mPulseBrightness;
+    private CustomSeekBarPreference mDozeBrightness;
 
     private SharedPreferences mPreferences;
 
@@ -131,6 +136,29 @@ public class DozeSettings extends SettingsPreferenceFragment implements
         } else {
             mDozeAlwaysOnPreference.setOnPreferenceChangeListener(this);
         }
+
+        int defaultDoze = getResources().getInteger(
+                com.android.internal.R.integer.config_screenBrightnessDoze);
+        int defaultPulse = getResources().getInteger(
+                com.android.internal.R.integer.config_screenBrightnessPulse);
+        if (defaultPulse == -1) {
+            defaultPulse = defaultDoze;
+        }
+
+        mPulseBrightness = (CustomSeekBarPreference) findPreference(KEY_PULSE_BRIGHTNESS);
+        int value = Settings.System.getInt(getContentResolver(),
+                Settings.System.PULSE_BRIGHTNESS, defaultPulse);
+        mPulseBrightness.setValue(value);
+        mPulseBrightness.setOnPreferenceChangeListener(this);
+
+        mDozeBrightness = (CustomSeekBarPreference) findPreference(KEY_DOZE_BRIGHTNESS);
+        value = Settings.System.getInt(getContentResolver(),
+                Settings.System.DOZE_BRIGHTNESS, defaultDoze);
+        mDozeBrightness.setValue(value);
+        mDozeBrightness.setOnPreferenceChangeListener(this);
+        if (!Utils.isDozeAlwaysOnAvailable(context)) {
+            getPreferenceScreen().removePreference(mDozeBrightness);
+        }
     }
 
     @Override
@@ -173,6 +201,16 @@ public class DozeSettings extends SettingsPreferenceFragment implements
             Settings.Secure.putIntForUser(resolver, Settings.Secure.RAISE_TO_WAKE_GESTURE, 
                  value ? 1 : 0, UserHandle.USER_CURRENT);
             checkService(context);
+            return true;
+        } else if (preference == mPulseBrightness) {
+            int value = (Integer) newValue;
+            Settings.System.putIntForUser(resolver, Settings.System.PULSE_BRIGHTNESS,
+                    value, UserHandle.USER_CURRENT);
+            return true;
+        } else if (preference == mDozeBrightness) {
+            int value = (Integer) newValue;
+            Settings.System.putIntForUser(resolver, Settings.System.DOZE_BRIGHTNESS,
+                    value, UserHandle.USER_CURRENT);
             return true;
         }
         return false;
@@ -261,6 +299,17 @@ public class DozeSettings extends SettingsPreferenceFragment implements
                 Settings.Secure.PULSE_ON_NEW_TRACKS, 0, UserHandle.USER_CURRENT);
         Settings.System.putIntForUser(resolver,
                 Settings.System.AMBIENT_SWIPE, 1, UserHandle.USER_CURRENT);
+        int defaultDoze = mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_screenBrightnessDoze);
+        int defaultPulse = mContext.getResources().getInteger(
+                com.android.internal.R.integer.config_screenBrightnessPulse);
+        if (defaultPulse == -1) {
+            defaultPulse = defaultDoze;
+        }
+        Settings.System.putIntForUser(resolver,
+                Settings.System.PULSE_BRIGHTNESS, defaultPulse, UserHandle.USER_CURRENT);
+        Settings.System.putIntForUser(resolver,
+                Settings.System.DOZE_BRIGHTNESS, defaultDoze, UserHandle.USER_CURRENT);
     }
 
     @Override

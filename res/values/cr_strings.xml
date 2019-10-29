@@ -2802,4 +2802,12 @@
 
     <!-- Radio Info -->
     <string name="radio_info_title">Radio info</string>
+
+    <!-- Doze Brightness Config -->
+    <string name="doze_brightness_category">Doze Brightness Config</string>
+    <string name="doze_brightness_footer">Doze Brightness depends on current screen brightness and real doze brightness will be set to brightness setting that has lower value (e.g. if screen brightness less than doze brightness real doze brightness will be set to screen brightness)</string>
+    <string name="ambient_pulse_brightness_title">Ambient notification brightness</string>
+    <string name="ambient_pulse_brightness_summary">Set brightness to use when notifcations are shown</string>
+    <string name="ambient_doze_brightness_title">Ambient display brightness</string>
+    <string name="ambient_doze_brightness_summary">Set brightness to use during ambient display on</string>
 </resources>
