@@ -2785,4 +2785,8 @@
     <string name="current_battery_capacity">Current battery capacity</string>
     <string name="designed_battery_capacity">Designed battery capacity</string>
     <string name="battery_charge_cycles">Charge cycles completed</string>
+
+    <!-- Per-app volume -->
+    <string name="show_app_volume_title">Show app volume</string>
+    <string name="show_app_volume_summary">Show app volume in volume panel (Only works for Stock Volume panel)</string>
 </resources>
